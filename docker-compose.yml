@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ibscn-postgres
+    restart: unless-stopped
+    environment:
+      TZ: America/Sao_Paulo
+      PGTZ: America/Sao_Paulo
+      POSTGRES_DB: ${DB_NAME:-ibscn_db}
+      POSTGRES_USER: ${DB_USER:-ibscn_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ibscn_pass}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-ibscn_user} -d $${POSTGRES_DB:-ibscn_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  pgdata:
+    name: ibscn-pgdata
